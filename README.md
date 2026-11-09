@@ -44,7 +44,7 @@ flowchart TD
 
 Tamper cases include a dependency swap, artifact digest mismatch, unapproved builder, forged key, stale provenance signature, and SBOM/provenance mismatch. Timings are environment-specific and not a performance claim.
 
-## Design decisions and lessons to discuss
+## What I learned / design decisions I made
 
 - The verifier resolves a key from an external trust store by builder identity; it does not trust the bundle's key hint as an authority.
 - Build and trust enrollment are separate operations so the build cannot enroll its own key as a side effect.
