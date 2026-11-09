@@ -1,0 +1,13 @@
+services:
+  provenanceforge:
+    build: .
+    image: provenanceforge-slsa:local
+    container_name: provenanceforge-slsa
+    ports:
+      - "127.0.0.1:8093:8000"
+    tmpfs:
+      - /tmp:size=32m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    restart: unless-stopped

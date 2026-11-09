@@ -1,0 +1,5 @@
+# Declared dependencies for the sample product (name==version).
+# The pipeline turns this into an SBOM and records it as build materials.
+left-pad==1.3.0
+tiny-json==2.1.0
+logfmt==0.4.2

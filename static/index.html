@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProvenanceForge-SLSA</title>
+<style>
+  :root{
+    --bg:#15110c; --bg2:#1d1811; --panel:#211a12; --panel2:#2a2016; --line:#3b2e1f;
+    --ink:#f4ead9; --muted:#b39d80; --amber:#f0a92b; --amber2:#d4841a; --gold:#f6c860;
+    --ok:#7ad17a; --bad:#f08a6b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:
+      radial-gradient(900px 500px at 15% -10%,rgba(240,169,43,.12),transparent 55%),var(--bg);
+      color:var(--ink);font:15px/1.65 "Iowan Old Style","Palatino Linotype",Georgia,serif}
+  .sans{font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+  .hero{padding:54px 26px 30px;max-width:1040px;margin:0 auto;text-align:center}
+  .logo{width:66px;height:66px;margin:0 auto 18px;display:block;filter:drop-shadow(0 6px 18px rgba(240,169,43,.4))}
+  .hero h1{margin:0;font-size:46px;letter-spacing:-.02em;line-height:1.05;
+    background:linear-gradient(180deg,#fff5e3,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .tag{font-family:-apple-system,Segoe UI,sans-serif;color:var(--muted);font-size:17px;margin-top:12px;max-width:620px;margin-left:auto;margin-right:auto}
+  .run{font-family:-apple-system,Segoe UI,sans-serif;margin-top:26px;background:linear-gradient(180deg,var(--gold),var(--amber2));
+    border:0;color:#2a1a05;font-weight:800;font-size:15px;padding:14px 30px;border-radius:999px;cursor:pointer;
+    box-shadow:0 10px 30px rgba(240,169,43,.3);transition:transform .06s}
+  .run:active{transform:translateY(1px)}
+  .wrap{max-width:1040px;margin:0 auto;padding:10px 20px 80px}
+  .sec{margin-top:34px}
+  .sec h2{font-family:-apple-system,Segoe UI,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--amber);margin:0 0 14px;display:flex;align-items:center;gap:10px}
+  .sec h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.cols{grid-template-columns:1fr}.hero h1{font-size:34px}}
+  .panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+  .panel h3{font-family:-apple-system,Segoe UI,sans-serif;margin:0 0 10px;font-size:12.5px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--muted)} .kv .v{color:var(--ink);text-align:right;word-break:break-all}
+  .digest{color:var(--gold)}
+  .chklist{list-style:none;margin:0;padding:0}
+  .chkrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-family:-apple-system,Segoe UI,sans-serif}
+  .chkrow:last-child{border-bottom:0}
+  .badge{font-family:-apple-system,Segoe UI,sans-serif;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px}
+  .pass{background:rgba(122,209,122,.15);color:var(--ok)} .fail{background:rgba(240,138,107,.16);color:var(--bad)}
+  .admit{font-family:-apple-system,Segoe UI,sans-serif;text-align:center;font-weight:800;font-size:20px;margin-top:8px}
+  .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:620px){.tgrid{grid-template-columns:1fr}}
+  .tcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-family:-apple-system,Segoe UI,sans-serif}
+  .tcard .nm{font-weight:700}
+  .fired{margin-top:6px;color:var(--muted);font-size:12.5px}
+  .fired code{background:#120d07;color:var(--gold);padding:1px 6px;border-radius:6px;margin-right:4px}
+  .muted{color:var(--muted)} .sans{font-family:-apple-system,Segoe UI,sans-serif}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-family:-apple-system,Segoe UI,sans-serif;color:var(--muted);font-size:12.5px;
+    border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+  .empty{color:var(--muted);text-align:center;padding:30px;font-family:-apple-system,Segoe UI,sans-serif}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid #2a1a05;border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px}
+  @keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <svg class="logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6c860"/><stop offset="1" stop-color="#d4841a"/></linearGradient></defs>
+    <rect x="12" y="40" width="40" height="8" rx="3" fill="url(#a)"/>
+    <path d="M20 40c0-9 5-14 12-14s12 5 12 14" stroke="url(#a)" stroke-width="3.2" fill="none"/>
+    <circle cx="32" cy="20" r="7" fill="url(#a)"/>
+    <path d="M32 12v-6M32 34v4M24 20h-6M46 20h-6" stroke="#f6c860" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>
+  </svg>
+  <h1>ProvenanceForge</h1>
+  <div class="tag sans">A build pipeline you can trust. Signed SBOM &amp; SLSA provenance, keys pinned
+    <b>outside</b> the bundle, and verification against the real artifact — proven by live tamper tests.</div>
+  <button class="run" id="runBtn" onclick="runAll()">Forge &amp; verify a release</button>
+  <div style="margin-top:16px"><span class="pill"><span class="dot"></span> runs in a sandbox · nothing leaves this machine</span></div>
+</div>
+
+<div class="wrap">
+  <div id="out" class="empty">Press “Forge &amp; verify a release” to build a signed release and run the tamper lab.</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+async function runAll(){
+  const b=$('runBtn'); b.innerHTML='<span class="spin"></span> Forging…'; b.disabled=true;
+  const [p,t] = await Promise.all([
+    fetch('/api/pipeline').then(r=>r.json()),
+    fetch('/api/tamper').then(r=>r.json())
+  ]);
+  b.innerHTML='Forge &amp; verify a release'; b.disabled=false;
+  render(p,t);
+}
+function render(p,t){
+  const files = p.files.map(f=>`<div class="kv"><span class="k mono">${esc(f.path)}</span><span class="v mono digest">${f.sha256.slice(0,18)}…</span></div>`).join('');
+  const sbom = p.sbom.map(c=>`<div class="kv"><span class="k">${esc(c.name)}</span><span class="v mono">${esc(c.version)}</span></div>`).join('');
+  const mats = p.provenance.materials.map(m=>`<div class="kv"><span class="k mono">${esc(m)}</span><span class="v"></span></div>`).join('');
+  const checks = p.decision.checks.map(c=>`<li class="chkrow">
+      <span class="badge ${c.passed?'pass':'fail'}">${c.passed?'PASS':'FAIL'}</span>
+      <b>${c.id}</b> <span>${esc(c.name)}</span></li>`).join('');
+  const tcards = t.experiments.map(e=>`<div class="tcard">
+      <div class="nm">${e.is_attack?'🛡 ':'✓ '}${esc(e.name)}
+        <span class="badge ${e.caught?'pass':'fail'}" style="float:right">${e.is_attack?(e.caught?'CAUGHT':'MISSED'):(e.caught?'ADMITTED':'BROKE')}</span></div>
+      <div class="fired">checks: ${e.fired.length?e.fired.map(f=>`<code>${f}</code>`).join(''):'<span class="muted">none</span>'}</div>
+    </div>`).join('');
+  $('out').innerHTML = `
+    <div class="sec"><h2>Release artifact</h2>
+      <div class="panel"><h3>Release digest (hash over the whole tree)</h3>
+        <div class="kv"><span class="k">${esc(p.artifact.name)}</span><span class="v mono digest">${p.artifact.sha256}</span></div>
+        <h3 style="margin-top:14px">Files</h3>${files}</div></div>
+
+    <div class="sec"><h2>Provenance &amp; inventory</h2><div class="cols">
+      <div class="panel"><h3>SLSA provenance</h3>
+        <div class="kv"><span class="k">builder</span><span class="v mono">${esc(p.provenance.builder)}</span></div>
+        <div class="kv"><span class="k">source</span><span class="v mono">${esc(p.provenance.source)}</span></div>
+        <div class="kv"><span class="k">ref</span><span class="v mono">${esc(p.provenance.ref)}</span></div>
+        <h3 style="margin-top:14px">Materials</h3>${mats}</div>
+      <div class="panel"><h3>CycloneDX SBOM</h3>${sbom}
+        <h3 style="margin-top:14px">Trust store (pinned builders)</h3>
+        ${p.trust_store.map(b=>`<div class="kv"><span class="k mono">${esc(b)}</span><span class="v"><span class="badge pass">trusted</span></span></div>`).join('')}</div>
+    </div></div>
+
+    <div class="sec"><h2>Admission policy</h2><div class="panel">
+      <ul class="chklist">${checks}</ul>
+      <div class="admit" style="color:${p.decision.admitted?'var(--ok)':'var(--bad)'}">${p.decision.admitted?'✓ ADMITTED':'✗ REJECTED'}</div></div></div>
+
+    <div class="sec"><h2>Tamper lab — ${t.summary.caught}/${t.summary.attacks} attacks caught</h2>
+      <div class="tgrid">${tcards}</div></div>`;
+}
+</script>
+</body>
+</html>
